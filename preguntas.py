@@ -203,8 +203,7 @@ def pregunta_13():
     Name: _c5b, dtype: int64
     """
     merged = pd.merge(tbl0, tbl2, on='_c0')
-    result = merged.groupby('_c1')['_c5b'].sum().reset_index(drop=True)
+    result = merged.groupby('_c1')['_c5b'].sum()
     return result
 
 
-print(pregunta_13())
