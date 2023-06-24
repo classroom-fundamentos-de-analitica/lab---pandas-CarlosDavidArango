@@ -123,6 +123,7 @@ def pregunta_09():
 
     """
     tbl0['year'] = pd.to_datetime(tbl0['_c3']).dt.year
+    tbl0['year'] = tbl0['year'].astype(str)
     return tbl0
 
 
