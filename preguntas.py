@@ -9,7 +9,8 @@ Utilice los archivos `tbl0.tsv`, `tbl1.tsv` y `tbl2.tsv`, para resolver las preg
 """
 import pandas as pd
 
-tbl0 = pd.read_csv("tbl0.tsv", sep="\t")
+
+tbl0 = pd.read_csv("tbl0.tsv", sep="\t", parse_dates=['_c3'])
 tbl1 = pd.read_csv("tbl1.tsv", sep="\t")
 tbl2 = pd.read_csv("tbl2.tsv", sep="\t")
 
@@ -122,8 +123,8 @@ def pregunta_09():
     39   39   E    5  1998-01-26  1998
 
     """
-    tbl0['year'] = pd.to_datetime(tbl0['_c3']).dt.year
-    tbl0['year'] = tbl0['year'].astype(str)
+
+    tbl0['year'] = tbl0['_c3'].str[:4]
     return tbl0
 
 
@@ -142,7 +143,7 @@ def pregunta_10():
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
     """
     
-    tabla = tbl0.groupby('_c1')['_c2'].apply(lambda x: ':'.join(map(str, x))).reset_index()
+    tabla = tbl0.groupby('_c1')['_c2'].apply(lambda x: ':'.join(map(str,  sorted(x)))).reset_index()
     return tabla
 
 
@@ -181,7 +182,7 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    grouped = tbl2.groupby('_c0').apply(lambda x: ','.join([f'{a}:{b}' for a, b in zip(x['_c5a'], x['_c5b'])]))
+    grouped = tbl2.groupby('_c0').apply(lambda x: ','.join([f'{a}:{b}' for a, b in sorted(zip(x['_c5a'], x['_c5b']))]))
 
     result = pd.DataFrame({'_c0': grouped.index, '_c5': grouped.values})
     return result
@@ -202,5 +203,8 @@ def pregunta_13():
     Name: _c5b, dtype: int64
     """
     merged = pd.merge(tbl0, tbl2, on='_c0')
-    result = merged.groupby('_c1')['_c5b'].sum().reset_index()
+    result = merged.groupby('_c1')['_c5b'].sum().reset_index(drop=True)
     return result
+
+
+print(pregunta_13())
