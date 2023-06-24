@@ -30,13 +30,13 @@ def pregunta_02():
 
 def pregunta_03():
    
-    conteo_por_letra = tbl0['_c1'].value_counts()
-    return conteo_por_letra
+    registro_por_letra = tbl0['_c1'].value_counts().sort_index()
+    return registro_por_letra
 
 
 def pregunta_04():
    
-    promedio_por_letra = tbl0.groupby('_c1')['_c2'].mean().reset_index()['_c2']
+    promedio_por_letra = tbl0.groupby('_c1')['_c2'].mean()
     return promedio_por_letra
 
 
@@ -122,7 +122,7 @@ def pregunta_09():
     39   39   E    5  1998-01-26  1998
 
     """
-    tbl0['año'] = pd.to_datetime(tbl0['_c3']).dt.year
+    tbl0['year'] = pd.to_datetime(tbl0['_c3']).dt.year
     return tbl0
 
 
@@ -140,7 +140,8 @@ def pregunta_10():
     3   D                  1:2:3:5:5:7
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
     """
-    tabla = tbl0.groupby(['_c0', '_c1'])['_c2'].apply(lambda x: ':'.join(map(str, x))).reset_index()
+    
+    tabla = tbl0.groupby('_c1')['_c2'].apply(lambda x: ':'.join(map(str, x))).reset_index()
     return tabla
 
 
@@ -179,7 +180,8 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    grouped = tbl2.groupby(0)[[1, 2]].apply(lambda x: ','.join([f'{a}:{b}' for a, b in zip(x[1], x[2])]))
+    grouped = tbl2.groupby('_c0').apply(lambda x: ','.join([f'{a}:{b}' for a, b in zip(x['_c5a'], x['_c5b'])]))
+
     result = pd.DataFrame({'_c0': grouped.index, '_c5': grouped.values})
     return result
 
@@ -198,5 +200,6 @@ def pregunta_13():
     E    275
     Name: _c5b, dtype: int64
     """
-    result = tbl2.groupby(tbl0['_c1'])['_c5b'].sum()
+    merged = pd.merge(tbl0, tbl2, on='_c0')
+    result = merged.groupby('_c1')['_c5b'].sum().reset_index()
     return result
