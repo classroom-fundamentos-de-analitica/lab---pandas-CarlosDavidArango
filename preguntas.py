@@ -143,8 +143,11 @@ def pregunta_10():
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
     """
     
-    tabla = tbl0.groupby('_c1')['_c2'].apply(lambda x: ':'.join(map(str,  sorted(x)))).reset_index()
-    return tabla
+    tbl3 = tbl0[["_c1","_c2"]]
+    tbl3 = tbl3.sort_values("_c2")
+    tbl3["_c2"] = tbl3["_c2"].astype("str")
+    tbl4 = tbl3.groupby("_c1").agg({"_c2":':'.join})    
+    return tbl4
 
 
 def pregunta_11():
