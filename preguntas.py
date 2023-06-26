@@ -9,63 +9,36 @@ Utilice los archivos `tbl0.tsv`, `tbl1.tsv` y `tbl2.tsv`, para resolver las preg
 """
 import pandas as pd
 
-tbl0 = pd.read_csv("tbl0.tsv", sep="\t")
+
+tbl0 = pd.read_csv("tbl0.tsv", sep="\t", parse_dates=['_c3'])
 tbl1 = pd.read_csv("tbl1.tsv", sep="\t")
 tbl2 = pd.read_csv("tbl2.tsv", sep="\t")
 
 
 def pregunta_01():
-    """
-    ¿Cuál es la cantidad de filas en la tabla `tbl0.tsv`?
+   
+    cantidad_filas = tbl0.shape[0]
 
-    Rta/
-    40
 
-    """
-    return
+    return cantidad_filas
 
 
 def pregunta_02():
-    """
-    ¿Cuál es la cantidad de columnas en la tabla `tbl0.tsv`?
-
-    Rta/
-    4
-
-    """
-    return
+   
+    cantidad_columnas = tbl0.shape[1]
+    return cantidad_columnas
 
 
 def pregunta_03():
-    """
-    ¿Cuál es la cantidad de registros por cada letra de la columna _c1 del archivo
-    `tbl0.tsv`?
-
-    Rta/
-    A     8
-    B     7
-    C     5
-    D     6
-    E    14
-    Name: _c1, dtype: int64
-
-    """
-    return
+   
+    registro_por_letra = tbl0['_c1'].value_counts().sort_index()
+    return registro_por_letra
 
 
 def pregunta_04():
-    """
-    Calcule el promedio de _c2 por cada letra de la _c1 del archivo `tbl0.tsv`.
-
-    Rta/
-    A    4.625000
-    B    5.142857
-    C    5.400000
-    D    3.833333
-    E    4.785714
-    Name: _c2, dtype: float64
-    """
-    return
+   
+    promedio_por_letra = tbl0.groupby('_c1')['_c2'].mean()
+    return promedio_por_letra
 
 
 def pregunta_05():
@@ -82,7 +55,8 @@ def pregunta_05():
     E    9
     Name: _c2, dtype: int64
     """
-    return
+    maximo_por_letra = tbl0.groupby('_c1')['_c2'].max()
+    return maximo_por_letra
 
 
 def pregunta_06():
@@ -94,7 +68,8 @@ def pregunta_06():
     ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
     """
-    return
+    valores_unicos = sorted(tbl1['_c4'].str.upper().unique())
+    return valores_unicos
 
 
 def pregunta_07():
@@ -110,7 +85,8 @@ def pregunta_07():
     E    67
     Name: _c2, dtype: int64
     """
-    return
+    suma_por_letra = tbl0.groupby('_c1')['_c2'].sum()
+    return suma_por_letra
 
 
 def pregunta_08():
@@ -128,7 +104,8 @@ def pregunta_08():
     39   39   E    5  1998-01-26    44
 
     """
-    return
+    tbl0['suma'] = tbl0['_c0'] + tbl0['_c2']
+    return tbl0
 
 
 def pregunta_09():
@@ -146,7 +123,9 @@ def pregunta_09():
     39   39   E    5  1998-01-26  1998
 
     """
-    return
+
+    tbl0['year'] = tbl0['_c3'].str[:4]
+    return tbl0
 
 
 def pregunta_10():
@@ -163,7 +142,12 @@ def pregunta_10():
     3   D                  1:2:3:5:5:7
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
     """
-    return
+    
+    tbl3 = tbl0[["_c1","_c2"]]
+    tbl3 = tbl3.sort_values("_c2")
+    tbl3["_c2"] = tbl3["_c2"].astype("str")
+    tbl4 = tbl3.groupby("_c1").agg({"_c2":':'.join})    
+    return tbl4
 
 
 def pregunta_11():
@@ -182,7 +166,8 @@ def pregunta_11():
     38   38      d,e
     39   39    a,d,f
     """
-    return
+    aggregated_df = tbl1.groupby('_c0')['_c4'].apply(lambda x: ','.join(sorted(set(x)))).reset_index()
+    return aggregated_df
 
 
 def pregunta_12():
@@ -200,7 +185,10 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    return
+    grouped = tbl2.groupby('_c0').apply(lambda x: ','.join([f'{a}:{b}' for a, b in sorted(zip(x['_c5a'], x['_c5b']))]))
+
+    result = pd.DataFrame({'_c0': grouped.index, '_c5': grouped.values})
+    return result
 
 
 def pregunta_13():
@@ -217,4 +205,8 @@ def pregunta_13():
     E    275
     Name: _c5b, dtype: int64
     """
-    return
+    merged = pd.merge(tbl0, tbl2, on='_c0')
+    result = merged.groupby('_c1')['_c5b'].sum()
+    return result
+
+
